@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -25,23 +26,30 @@
             background-color: #ff9f1c;
             color: white;
             border: none;
-            margin: 10px;
-            width: 140px;
+            margin: 10px auto;
+            width: 180px;
         }
         .btn-orange:hover {
             background-color: #e98b00;
             color: white;
+        }
+        .logo {
+            width: 120px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <img src="{% static 'img/anfora.png' %}" alt="Logo Askos" class="logo" />
     <h2>Benvenuto in Askos Tours</h2>
-    <p>Scegli un'opzione:</p>
+    <p class="mb-4">Scegli un'opzione:</p>
 
-    <a href="{% url 'registrazione' %}" class="btn btn-orange">Registrazione</a>
-    <a href="{% url 'login' %}" class="btn btn-orange">Login</a>
+    <a href="{% url 'registrazione' %}" class="btn btn-orange d-block">Registrazione Cliente</a>
+    <a href="{% url 'login' %}" class="btn btn-orange d-block">Login Cliente</a>
+    <a href="{% url 'login_staff' %}" class="btn btn-orange d-block">Login Staff</a>
+    <a href="{% url 'registrazione_staff' %}" class="btn btn-orange d-block">Registrazione Staff</a>
 </div>
 
 </body>

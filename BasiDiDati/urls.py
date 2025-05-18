@@ -24,5 +24,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='index'),
     path('registrazione/', registrazione_view, name='registrazione'),
-    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
 ]
+from Askos.views import login_codice_fiscale
+
+urlpatterns += [
+    path('login/', login_codice_fiscale, name='login'),
+]
+
+
