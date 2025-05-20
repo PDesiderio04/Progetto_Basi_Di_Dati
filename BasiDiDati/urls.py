@@ -14,21 +14,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from Askos.views import index, registrazione_view
+from Askos.views import login_codice_fiscale
+from Askos.views import login_staff_view, registrazione_staff_view
+from Askos.views import index  # o dalla tua app
 from django.contrib import admin
 from django.urls import path
-from django.contrib.auth import views as auth_views
-from Askos.views import index, registrazione_view
-
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', index, name='index'),
-    path('registrazione/', registrazione_view, name='registrazione'),
-]
-from Askos.views import login_codice_fiscale
-
-urlpatterns += [
+    path('', index, name='index'),  # questa è la root del sito
     path('login/', login_codice_fiscale, name='login'),
+    path('registrazione/', registrazione_view, name='registrazione'),
+    path('login-staff/', login_staff_view, name='login_staff'),
+    path('registrazione-staff/', registrazione_staff_view, name='registrazione_staff'),
+    path('admin/', admin.site.urls),  # <--- questa riga è OBBLIGATORIA
 ]
-
 

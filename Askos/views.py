@@ -67,3 +67,48 @@ def login_codice_fiscale(request):
 
     return render(request, 'login.html', {'form': form})
 
+from django.shortcuts import render, redirect
+from .models import Staff
+
+def registrazione_staff_view(request):
+    if request.method == 'POST':
+        cod_fiscale = request.POST.get('cod_fiscale')
+        nome = request.POST.get('nome')
+        cognome = request.POST.get('cognome')
+        telefono = request.POST.get('telefono')
+        email = request.POST.get('email')
+        ruolo = request.POST.get('ruolo')
+
+        # controllo codice fiscale duplicato
+        if Staff.objects.filter(cod_fiscale=cod_fiscale).exists():
+            return render(request, 'registrazione_staff.html', {'errore': 'Codice fiscale già registrato.'})
+
+        Staff.objects.create(
+            cod_fiscale=cod_fiscale,
+            nome=nome,
+            cognome=cognome,
+            telefono=telefono,
+            email=email,
+            ruolo=ruolo
+        )
+        return redirect('login_staff')  # dopo registrazione, vai al login staff
+
+    return render(request, 'registrazione_staff.html')
+
+from django.contrib.auth import authenticate, login
+from .forms import StaffLoginForm
+
+def login_staff_view(request):
+    if request.method == 'POST':
+        form = StaffLoginForm(request.POST)
+        if form.is_valid():
+            login(request, form.user)
+            return redirect('dashboard_staff')  # o un’altra pagina riservata
+    else:
+        form = StaffLoginForm()
+    return render(request, 'login_staff.html', {'form': form})
+
+from django.shortcuts import render
+
+def index(request):
+    return render(request, 'index.html')
