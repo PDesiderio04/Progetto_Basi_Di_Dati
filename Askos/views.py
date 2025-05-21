@@ -48,11 +48,15 @@ def registrazione_view(request):
         )
 
         login(request, user)
-        return redirect('index')
+        return redirect('tour_list')
 
     return render(request, 'registrazione.html')
 
 from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from .forms import CodiceFiscaleLoginForm
+
+from django.shortcuts import redirect
 from django.contrib.auth import login
 from .forms import CodiceFiscaleLoginForm
 
@@ -61,11 +65,12 @@ def login_codice_fiscale(request):
         form = CodiceFiscaleLoginForm(request.POST)
         if form.is_valid():
             login(request, form.user)
-            return redirect('index')
+            return redirect('tour_list')  # 👈 CAMBIATO QUI
     else:
         form = CodiceFiscaleLoginForm()
 
     return render(request, 'login.html', {'form': form})
+
 
 from django.shortcuts import render, redirect
 from .models import Staff
@@ -112,3 +117,38 @@ from django.shortcuts import render
 
 def index(request):
     return render(request, 'index.html')
+
+
+from django.shortcuts import render
+from .models import Tour, Cliente
+
+def tour_list_view(request):
+    tours = Tour.objects.all()
+    lingua_filtrata = False
+
+    if request.GET.get('lingua') == 'mia' and request.user.is_authenticated:
+        try:
+            cliente = Cliente.objects.get(user=request.user)
+            tours = tours.filter(lingua=cliente.lingua_preferita)
+            lingua_filtrata = True
+        except Cliente.DoesNotExist:
+            pass
+
+    return render(request, 'tour_list.html', {
+        'tours': tours,
+        'lingua_filtrata': lingua_filtrata,
+    })
+
+
+from django.contrib.auth.decorators import login_required
+from .models import Prenotazione
+
+@login_required
+def miei_tour_view(request):
+    try:
+        cliente = Cliente.objects.get(user=request.user)
+        prenotazioni = Prenotazione.objects.filter(cliente=cliente).select_related('tour')
+    except Cliente.DoesNotExist:
+        prenotazioni = []
+
+    return render(request, 'miei_tour.html', {'prenotazioni': prenotazioni})
