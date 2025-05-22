@@ -40,6 +40,7 @@ class Tour(models.Model):
     durata = models.CharField(max_length=50)
     prezzo = models.DecimalField(max_digits=8, decimal_places=2)
     lingua = models.ForeignKey(Lingua, on_delete=models.SET_NULL, null=True, related_name='tour')
+    staff_assegnato = models.ManyToManyField('Staff', related_name='tour_assegnati')
 
     guide = models.ManyToManyField(
         Staff,
@@ -78,3 +79,5 @@ class Recensione(models.Model):
 
     def __str__(self):
         return f"Recensione di {self.cliente} su {self.tour} - voto: {self.voto}"
+
+

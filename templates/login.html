@@ -9,18 +9,15 @@
         body {
             background-color: #fff6e5;
             font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
-        .container {
+        .form-container {
             background: white;
             padding: 30px 40px;
             border-radius: 12px;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
             max-width: 420px;
             width: 100%;
+            margin: 100px auto;
         }
         .btn-orange {
             background-color: #ff9f1c;
@@ -41,14 +38,35 @@
 </head>
 <body>
 
-<div class="container">
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-light bg-warning shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="{% url 'index' %}">
+      <img src="{% static 'img/anfora.jpg' %}" width="40" class="me-2" alt="Logo">Askos Tours
+    </a>
+    <div class="collapse navbar-collapse justify-content-end">
+      <ul class="navbar-nav">
+        {% if user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'tour_list' %}">Tour Disponibili</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'miei_tour' %}">I Miei Tour</a></li>
+          <li class="nav-item"><a class="nav-link text-danger" href="{% url 'logout' %}">Logout</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'registrazione' %}">Registrazione</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- FORM LOGIN -->
+<div class="form-container">
     <img src="{% static 'img/anfora.jpg' %}" alt="Logo Askos" class="logo" />
 
     <h3 class="mb-4 text-center">Accesso Cliente</h3>
 
     <form method="post">
         {% csrf_token %}
-
         <div class="mb-3">
             <label for="codice_fiscale" class="form-label">Codice Fiscale</label>
             <input type="text" name="codice_fiscale" id="codice_fiscale" class="form-control" required />

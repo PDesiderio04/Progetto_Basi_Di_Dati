@@ -22,6 +22,12 @@ from django.contrib import admin
 from django.urls import path
 from Askos.views import tour_list_view
 from Askos.views import miei_tour_view
+from Askos.views import prenota_tour
+from Askos.views import annulla_prenotazione
+from Askos.views import tour_assegnati_view
+from Askos.views import logout_view
+
+
 
 urlpatterns = [
     path('', index, name='index'),  # questa è la root del sito
@@ -32,6 +38,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('tours/', tour_list_view, name='tour_list'),
     path('i-miei-tour/', miei_tour_view, name='miei_tour'),
+    path('prenota/<int:tour_id>/', prenota_tour, name='prenota_tour'),
+path('annulla-prenotazione/<int:prenotazione_id>/', annulla_prenotazione, name='annulla_prenotazione'),
+
+    path('logout/', logout_view, name='logout'),
+
+    path('staff/tour-assegnati/', tour_assegnati_view, name='tour_assegnati'),
+
 ]
 
 
