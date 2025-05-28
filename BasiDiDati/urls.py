@@ -26,6 +26,8 @@ from Askos.views import prenota_tour
 from Askos.views import annulla_prenotazione
 from Askos.views import tour_assegnati_view
 from Askos.views import logout_view
+from Askos.views import lascia_recensione
+from Askos.views import recensioni_view
 
 
 
@@ -44,6 +46,11 @@ path('annulla-prenotazione/<int:prenotazione_id>/', annulla_prenotazione, name='
     path('logout/', logout_view, name='logout'),
 
     path('staff/tour-assegnati/', tour_assegnati_view, name='tour_assegnati'),
+
+path('recensione/<int:tour_id>/', lascia_recensione, name='lascia_recensione'),
+
+path('recensioni/', recensioni_view, name='recensioni_pubbliche')
+
 
 ]
 

@@ -99,18 +99,21 @@ def index(request):
 from django.shortcuts import render
 from .models import Tour, Cliente
 
+from datetime import date
+
 def tour_list_view(request):
     tours = Tour.objects.all()
     lingua_filtrata = False
-    prenotati_ids = []
+    today = date.today()
 
+    prenotati_ids = []
     if request.user.is_authenticated:
         try:
             cliente = Cliente.objects.get(user=request.user)
-            prenotati_ids = list(Prenotazione.objects.filter(cliente=cliente).values_list('tour_id', flat=True))
-
+            tours = tours.exclude(prenotazioni__cliente=cliente)
+            prenotati_ids = Prenotazione.objects.filter(cliente=cliente).values_list('tour_id', flat=True)
             if request.GET.get('lingua') == 'mia':
-                tours = tours.filter(lingua=cliente.lingua_preferita)
+                tours = Tour.objects.filter(lingua=cliente.lingua_preferita)
                 lingua_filtrata = True
         except Cliente.DoesNotExist:
             pass
@@ -118,23 +121,42 @@ def tour_list_view(request):
     return render(request, 'tour_list.html', {
         'tours': tours,
         'lingua_filtrata': lingua_filtrata,
-        'prenotati_ids': prenotati_ids
+        'prenotati_ids': prenotati_ids,
+        'today': today,
     })
+
 
 
 
 from django.contrib.auth.decorators import login_required
 from .models import Prenotazione
 
+from django.utils import timezone
+
+from django.utils import timezone
+from .models import Prenotazione, Recensione, Cliente
+
+from django.utils import timezone
+from .models import Prenotazione, Cliente, Recensione
+
 @login_required
 def miei_tour_view(request):
+    today = timezone.now().date()
+
     try:
         cliente = Cliente.objects.get(user=request.user)
         prenotazioni = Prenotazione.objects.filter(cliente=cliente).select_related('tour')
+        tour_recensiti_ids = Recensione.objects.filter(cliente=cliente).values_list('tour_id', flat=True)
     except Cliente.DoesNotExist:
         prenotazioni = []
+        tour_recensiti_ids = []
 
-    return render(request, 'miei_tour.html', {'prenotazioni': prenotazioni})
+    return render(request, 'miei_tour.html', {
+        'prenotazioni': prenotazioni,
+        'today': today,
+        'tour_recensiti_ids': tour_recensiti_ids,
+    })
+
 
 
 from django.views.decorators.http import require_POST
@@ -281,4 +303,56 @@ def logout_view(request):
     logout(request)
     messages.success(request, "Logout effettuato con successo.")
     return redirect('index')
+
+from django.utils import timezone
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Tour, Cliente, Prenotazione, Recensione
+from django.contrib.auth.decorators import login_required
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.utils import timezone
+from .models import Tour, Recensione, Cliente
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def lascia_recensione(request, tour_id):
+    tour = get_object_or_404(Tour, id=tour_id)
+    cliente = get_object_or_404(Cliente, user=request.user)
+
+    oggi = timezone.now().date()
+
+    # ✅ BLOCCO: il tour non è ancora avvenuto
+    if tour.data > oggi:
+        messages.error(request, "Non puoi recensire un tour che non hai ancora svolto.")
+        return redirect('miei_tour')
+
+    # ✅ BLOCCO: già recensito
+    if Recensione.objects.filter(cliente=cliente, tour=tour).exists():
+        messages.warning(request, "Hai già recensito questo tour.")
+        return redirect('miei_tour')
+
+    if request.method == 'POST':
+        voto = int(request.POST['voto'])
+        commento = request.POST['commento']
+
+        Recensione.objects.create(
+            cliente=cliente,
+            tour=tour,
+            voto=voto,
+            commento=commento
+        )
+        messages.success(request, "Recensione inviata con successo.")
+        return redirect('miei_tour')
+
+    return render(request, 'lascia_recensione.html', {'tour': tour})
+
+
+from django.shortcuts import render
+from .models import Recensione
+
+def recensioni_view(request):
+    recensioni = Recensione.objects.select_related('cliente', 'tour').order_by('-data')
+    return render(request, 'recensioni_pubbliche.html', {'recensioni': recensioni})
 
