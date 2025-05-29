@@ -37,58 +37,76 @@
 
 <!-- MESSAGGI -->
 {% if messages %}
-  <div class="container mt-3">
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-  </div>
+<div class="container mt-3">
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+</div>
 {% endif %}
 
-<!-- INTESTAZIONE + FILTRI + LINK RECENSIONI -->
+<!-- INTESTAZIONE -->
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-start">Tour Disponibili</h2>
-        <a href="{% url 'recensioni_pubbliche' %}" class="btn btn-outline-primary">Recensioni Tour</a>
-    </div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-start">Tour Disponibili</h2>
+    <a href="{% url 'recensioni_pubbliche' %}" class="btn btn-outline-primary">Recensioni Tour</a>
+  </div>
 
-    <div class="text-center mb-4">
-        {% if lingua_filtrata %}
-            <a href="{% url 'tour_list' %}" class="btn btn-secondary">Tutti i tour</a>
-        {% else %}
-            <a href="?lingua=mia" class="btn btn-warning">Solo nella mia lingua</a>
-        {% endif %}
-    </div>
+  <!-- FILTRO LINGUA -->
+  <div class="text-center mb-4">
+    {% if lingua_filtrata %}
+      <a href="{% url 'tour_list' %}" class="btn btn-secondary">Tutti i tour</a>
+    {% else %}
+      <a href="?lingua=mia" class="btn btn-warning">Solo nella mia lingua</a>
+    {% endif %}
+  </div>
 
-    <div class="row">
-        {% for tour in tours %}
-            <div class="col-md-4 mb-4">
-                <div class="card p-3 h-100">
-                    <h5 class="card-title">{{ tour.nome }}</h5>
-                    <p>Data: {{ tour.data }}</p>
-                    <p>Durata: {{ tour.durata }} ore</p>
-                    <p>Prezzo: €{{ tour.prezzo }}</p>
-                    <p>Lingua: {{ tour.lingua.nome }}</p>
+  <!-- LISTA TOUR -->
+  <div class="row">
+    {% for tour in tours %}
+      <div class="col-md-4 mb-4">
+        <div class="card p-3 h-100">
+          <h5 class="card-title">{{ tour.nome }}</h5>
+          <p><strong>Data:</strong> {{ tour.data }}</p>
+          <p><strong>Durata:</strong> {{ tour.durata }} ore</p>
+          <p><strong>Prezzo:</strong> €{{ tour.prezzo }}</p>
+          <p><strong>Lingua:</strong> {{ tour.lingua.nome }}</p>
 
-                    {% if user.is_authenticated %}
-                        {% if tour.data < today %}
-                            <p class="text-danger mt-2">Tour scaduto</p>
-                        {% elif tour.id in prenotati_ids %}
-                            <p class="text-success mt-2">Già prenotato</p>
-                        {% else %}
-                            <form method="post" action="{% url 'prenota_tour' tour.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-success mt-2">Prenota</button>
-                            </form>
-                        {% endif %}
-                    {% else %}
-                        <p class="text-muted mt-2">Accedi per prenotare</p>
-                    {% endif %}
-                </div>
-            </div>
-        {% empty %}
-            <p class="text-center">Nessun tour disponibile.</p>
-        {% endfor %}
-    </div>
+          <p><strong>Guide:</strong>
+            {% for g in tour.guide.all %}
+              {{ g.nome }} {{ g.cognome }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+              Nessuna
+            {% endfor %}
+          </p>
+
+          <p><strong>Driver:</strong>
+            {% for d in tour.driver.all %}
+              {{ d.nome }} {{ d.cognome }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+              Nessuno
+            {% endfor %}
+          </p>
+
+          {% if user.is_authenticated %}
+            {% if tour.data < today %}
+              <p class="text-danger mt-2">Tour scaduto</p>
+            {% elif tour.id in prenotati_ids %}
+              <p class="text-success mt-2">Già prenotato</p>
+            {% else %}
+              <form method="post" action="{% url 'prenota_tour' tour.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success mt-2">Prenota</button>
+              </form>
+            {% endif %}
+          {% else %}
+            <p class="text-muted mt-2">Accedi per prenotare</p>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-center">Nessun tour disponibile.</p>
+    {% endfor %}
+  </div>
 </div>
 
 </body>

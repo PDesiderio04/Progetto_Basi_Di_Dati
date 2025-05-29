@@ -25,11 +25,14 @@ class LinguaAdmin(admin.ModelAdmin):
     search_fields = ('nome',)
 
 # 🔹 Tour admin
+from django.contrib import admin
+from .models import Tour, Staff
+
 @admin.register(Tour)
 class TourAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nome', 'data', 'durata', 'prezzo', 'lingua')
-    search_fields = ('nome',)
-    list_filter = ('lingua',)
+    list_display = ['nome', 'data', 'prezzo']
+    filter_horizontal = ['guide', 'driver', 'staff_assegnato']
+
 
 # 🔹 Prenotazione admin
 @admin.register(Prenotazione)

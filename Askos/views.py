@@ -7,8 +7,6 @@ from django.shortcuts import render
 def index(request):
     return render(request, 'index.html')
 
-def registrazione_view(request):
-    return render(request, 'registrazione.html')
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from .models import Cliente, Lingua
@@ -237,6 +235,10 @@ from django.shortcuts import render, redirect
 from .models import Staff, Lingua
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
+from .models import Staff, Lingua
 
 def registrazione_staff_view(request):
     if request.method == 'POST':
@@ -247,13 +249,13 @@ def registrazione_staff_view(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         ruolo = request.POST.get('ruolo')
-        lingue_ids = request.POST.getlist('lingue')  # 👈 prende tutte le lingue selezionate
+        lingue_ids = request.POST.getlist('lingue')
 
-        # verifica se già esiste staff con quel codice fiscale
+        # Verifica duplicato
         if Staff.objects.filter(cod_fiscale=cod_fiscale).exists():
             return render(request, 'registrazione_staff.html', {'errore': 'Codice fiscale già registrato.'})
 
-        # salva il record staff
+        # Crea Staff
         staff = Staff.objects.create(
             cod_fiscale=cod_fiscale,
             nome=nome,
@@ -263,20 +265,21 @@ def registrazione_staff_view(request):
             ruolo=ruolo
         )
 
-        # associa lingue
+        # Assegna lingue (ManyToMany)
         staff.lingue.set(lingue_ids)
 
-        # (Opzionale) crea anche un account User associato
-        user = User.objects.create(
+        # Crea utente collegato (opzionale ma utile per login staff)
+        User.objects.create(
             username=cod_fiscale,
             email=email,
-            password=make_password(password)  # 👈 crittografia della password
+            password=make_password(password)
         )
 
-        # redirect dopo registrazione
-        return redirect('login_staff')
+        return redirect('login_staff')  # ✅ chiusa la parentesi mancante
 
-    return render(request, 'registrazione_staff.html')
+    lingue = Lingua.objects.all()
+    return render(request, 'registrazione_staff.html', {'lingue': lingue})
+
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
