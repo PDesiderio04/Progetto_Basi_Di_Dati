@@ -14,6 +14,7 @@
 </head>
 <body>
 
+<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-light bg-warning shadow-sm">
     <div class="container">
         <a class="navbar-brand fw-bold" href="{% url 'index' %}">
@@ -22,29 +23,30 @@
         <div class="collapse navbar-collapse justify-content-end">
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+                    <li class="nav-item"><a class="nav-link text-danger" href="{% url 'logout' %}">Logout</a></li>
                 {% endif %}
             </ul>
         </div>
     </div>
 </nav>
 
+<!-- CONTENUTO -->
 <div class="container">
-    <h2 class="text-center mb-4">I Miei Tour Assegnati</h2>
+    <h2 class="text-center mb-4">Tour Assegnati da Svolgere</h2>
 
     <div class="row">
         {% for tour in tours %}
             <div class="col-md-4 mb-4">
                 <div class="card p-3 h-100">
                     <h5 class="card-title">{{ tour.nome }}</h5>
-                    <p>Data: {{ tour.data }}</p>
-                    <p>Durata: {{ tour.durata }} ore</p>
-                    <p>Prezzo: €{{ tour.prezzo }}</p>
-                    <p>Lingua: {{ tour.lingua.nome }}</p>
+                    <p><strong>Data:</strong> {{ tour.data }}</p>
+                    <p><strong>Durata:</strong> {{ tour.durata }} ore</p>
+                    <p><strong>Prezzo:</strong> €{{ tour.prezzo }}</p>
+                    <p><strong>Lingua:</strong> {{ tour.lingua.nome }}</p>
                 </div>
             </div>
         {% empty %}
-            <p class="text-center">Nessun tour ti è stato ancora assegnato.</p>
+            <p class="text-center">Non hai tour assegnati futuri.</p>
         {% endfor %}
     </div>
 </div>

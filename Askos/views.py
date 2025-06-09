@@ -291,10 +291,12 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from .models import Staff
 
-@login_required
+from datetime import date
+
 def tour_assegnati_view(request):
-    staff = get_object_or_404(Staff, cod_fiscale=request.user.username)
-    tours = staff.tour_assegnati.all().order_by('data')  # solo i suoi tour
+    staff = Staff.objects.get(cod_fiscale=request.user.username)
+    today = date.today()
+    tours = staff.tour_assegnati.filter(data__gte=today)
     return render(request, 'tour_assegnati.html', {'tours': tours})
 
 
