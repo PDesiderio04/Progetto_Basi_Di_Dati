@@ -70,6 +70,8 @@
           <p><strong>Durata:</strong> {{ tour.durata }} ore</p>
           <p><strong>Prezzo:</strong> €{{ tour.prezzo }}</p>
           <p><strong>Lingua:</strong> {{ tour.lingua.nome }}</p>
+        <p><strong>Partecipanti prenotati:</strong> {{ tour.totale_partecipanti }}</p>
+
 
           <p><strong>Guide:</strong>
             {% for g in tour.guide.all %}

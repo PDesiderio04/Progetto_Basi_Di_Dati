@@ -57,7 +57,7 @@
           <p>Durata: {{ prenotazione.tour.durata }} ore</p>
           <p>Prezzo: €{{ prenotazione.tour.prezzo }}</p>
           <p>Lingua: {{ prenotazione.tour.lingua.nome }}</p>
-          <p>Partecipanti: {{ prenotazione.numero_partecipanti }}</p>
+
 
           {% if prenotazione.tour.data > today %}
             <form method="post" action="{% url 'annulla_prenotazione' prenotazione.id %}">

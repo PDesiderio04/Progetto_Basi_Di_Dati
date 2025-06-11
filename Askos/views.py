@@ -99,28 +99,44 @@ from .models import Tour, Cliente
 
 from datetime import date
 
+from django.db.models import Sum
+from datetime import date
+
 def tour_list_view(request):
     tours = Tour.objects.all()
-    lingua_filtrata = False
     today = date.today()
-
+    lingua_filtrata = False
     prenotati_ids = []
-    if request.user.is_authenticated:
+
+    # Filtro per lingua preferita
+    if request.GET.get('lingua') == 'mia' and request.user.is_authenticated:
         try:
             cliente = Cliente.objects.get(user=request.user)
-            tours = tours.exclude(prenotazioni__cliente=cliente)
-            prenotati_ids = Prenotazione.objects.filter(cliente=cliente).values_list('tour_id', flat=True)
-            if request.GET.get('lingua') == 'mia':
-                tours = Tour.objects.filter(lingua=cliente.lingua_preferita)
-                lingua_filtrata = True
+            tours = tours.filter(lingua=cliente.lingua_preferita)
+            lingua_filtrata = True
         except Cliente.DoesNotExist:
             pass
 
+    # Prendi gli ID dei tour già prenotati dall'utente
+    if request.user.is_authenticated:
+        try:
+            cliente = Cliente.objects.get(user=request.user)
+            prenotati_ids = list(
+                Prenotazione.objects.filter(cliente=cliente).values_list('tour_id', flat=True)
+            )
+        except Cliente.DoesNotExist:
+            pass
+
+    # Aggiungi il totale partecipanti per ogni tour come attributo aggiuntivo
+    for tour in tours:
+        tot = tour.prenotazioni.aggregate(totale=Sum('num_partecipanti'))['totale']
+        tour.totale_partecipanti = tot or 0
+
     return render(request, 'tour_list.html', {
         'tours': tours,
-        'lingua_filtrata': lingua_filtrata,
         'prenotati_ids': prenotati_ids,
-        'today': today,
+        'lingua_filtrata': lingua_filtrata,
+        'today': today
     })
 
 
