@@ -75,6 +75,7 @@
 
 - **Admin**:
   - Accesso da `http://127.0.0.1:8000/admin`
+  - Aggiunta dei tour con assegnazione di titolo, durata, prezzo, lingua, guida e driver.
   - Gestione completa dei dati.
 
   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
